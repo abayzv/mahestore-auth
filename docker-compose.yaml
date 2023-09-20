@@ -1,0 +1,43 @@
+services:
+  postgres:
+    image: abayzv/postgres
+    ports:
+      - ${DATABASE_PORT}:5432
+    volumes:
+      - boilerplate-db:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: ${DATABASE_USERNAME}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+      POSTGRES_DB: ${DATABASE_NAME}
+
+  maildev:
+    image: abayzv/maildev
+    build:
+      context: .
+      dockerfile: maildev.Dockerfile
+    ports:
+      - ${MAIL_CLIENT_PORT}:1080
+      - ${MAIL_PORT}:1025
+
+  adminer:
+    image: abayzv/adminer
+    restart: always
+    ports:
+      - 8080:8080
+
+  # Uncomment to use redis
+  # redis:
+  #   image: redis:7-alpine
+  #   ports:
+  #     - 6379:6379
+
+  api:
+    image: abayzv/auth-service-api
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - ${APP_PORT}:${APP_PORT}
+
+volumes:
+  boilerplate-db:
